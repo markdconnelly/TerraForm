@@ -1,12 +1,8 @@
-# TerraForm
-It's July 2024 and designing and architecting things at scale really requires an enterprise solution. For that, I decided to teach myself TF. 
-This repository will serve as my playground to teach myself and develop standards for security in Azure using TF.
+# GitHub Copilot
+I have built most of these things by hands so many times in the portal, so I am going to start off with just using GitHub Copilot to outline the various components I need for my standard design and going from there. 
 
-Import TF Block Update:
-https://www.youtube.com/watch?v=znfh_00EDZ0
+# Module Components
+As always, you have to get started with connectivity. 
 
-terraform plan -generate-config-out="{object}.tf"
-
-User Existing Resources:
-https://www.youtube.com/watch?v=QrSfASpVE14&list=PLnWpsLZNgHzVVslxs8Bwq19Ng0ff4XlFv&index=6
+This module is going to contain the Express Route objects, as well as the vWAN objects. The vWAN is multi object class in Azure and as such, is rather complex. It contains the user VPN gateway information, and if I end up testing Fortinet's VPN tunnel, it will include site to site as well. 
 
