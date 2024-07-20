@@ -17,7 +17,7 @@ resource "azurerm_resource_group" "Ent_ExpressRoutes_RG" {
     location = "Central US"
 }
 
-resource "azurerm_express_route_circuit" "er-champaign-chicago-cus-01" {
+resource "azurerm_express_route_circuit" "er-cmi-chi-cus-01" {
     name                = "er-cmi-chi-cus-01"
     location            = "chicago"
     resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
@@ -28,7 +28,7 @@ resource "azurerm_express_route_circuit" "er-champaign-chicago-cus-01" {
     }
 }
 
-resource "azurerm_express_route_circuit" "er-champaign-dallas-eus-01" {
+resource "azurerm_express_route_circuit" "er-cmi-dal-eus-01" {
     name                = "er-cmi-dal-eus-01"
     location            = "dallas"
     resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
@@ -61,16 +61,63 @@ resource "azurerm_express_route_circuit" "er-atl-mia-01" {
     }
 }
 
-resource "azurerm_express_route_circuit_peering" "example" {
+resource "azurerm_express_route_circuit_peering" "er-cmi-chi-cus-01-prvpeer" {
   peering_type                  = "AzurePrivatePeering"
-  express_route_circuit_name    = azurerm_express_route_circuit.er-champaign-chicago-cus-01.name
-  resource_group_name           = azurerm_resource_group.example.name
+  express_route_circuit_name    = azurerm_express_route_circuit.er-cmi-chi-cus-01.name
+  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
   shared_key                    = "ItsASecret"
   peer_asn                      = 65656
   primary_peer_address_prefix   = "192.168.1.0/30"
   secondary_peer_address_prefix = "192.168.2.0/30"
   vlan_id                       = 87
 }
+
+resource "azurerm_express_route_circuit_peering" "er-cmi-dal-eus-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-champaign-chicago-cus-01.name
+  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  primary_peer_address_prefix   = "192.168.3.0/30"
+  secondary_peer_address_prefix = "192.168.4.0/30"
+  vlan_id                       = 92
+}
+
+resource "azurerm_express_route_circuit_peering" "er-cmi-dal-eus-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-champaign-chicago-cus-01.name
+  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  primary_peer_address_prefix   = "192.168.3.0/30"
+  secondary_peer_address_prefix = "192.168.4.0/30"
+  vlan_id                       = 92
+}
+
+resource "azurerm_express_route_circuit_peering" "er-atl-atl-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-atl-atl-01.name
+  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  primary_peer_address_prefix   = "192.168.5.0/30"
+  secondary_peer_address_prefix = "192.168.6.0/30"
+  vlan_id                       = 35
+}
+
+resource "azurerm_express_route_circuit_peering" "er-atl-mia-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-atl-mia-01.name
+  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  primary_peer_address_prefix   = "192.168.7.0/30"
+  secondary_peer_address_prefix = "192.168.8.0/30"
+  vlan_id                       = 17
+}
+
+
+
 
 resource "azurerm_express_route_circuit_connection" "connection_1" {
     name                      = "connection_1"
