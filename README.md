@@ -10,11 +10,13 @@ terraform plan -generate-config-out="{object}.tf"
 User Existing Resources:
 https://www.youtube.com/watch?v=QrSfASpVE14&list=PLnWpsLZNgHzVVslxs8Bwq19Ng0ff4XlFv&index=6
 
-To illustrate this learning exercise, we must understand the intent behind the architecture getting built. This exercise will focus on an enterprise grade environment that is both close, secure, and highly available inter region and cross region. 
 
 # Environment Explanation
+To illustrate this learning exercise, we must understand the intent behind the architecture getting built. This exercise will focus on an enterprise grade environment that is both close, secure, and highly available inter region and cross region. 
+
 In my case, this uses Central US and East US 2 for its region pairing. When thinking through your example, use your closest region pairing. If you were in Europe for example, my regions wouldn't make sense. 
 
+# On Premise Network Connectivity
 This environment has two primary on premise data centers in the United States. It's primary location is based in Champaign, IL and it's secondary location is in Atlanta, GA. There is 100Gbps private fiber connectivity between the primary and secondary on premise locations. 
 
 Because this environment has such high speed connectivity between regions, equivelent cross connectivity between Azure regions is critical. We will use redundant connections between multiple carriers for our express routes. 
@@ -32,11 +34,14 @@ In the event of a central regional serviecs failure, both on premise locations w
 3. Atlanta's primary Express Route will connected to the Central US region via Atlanta, GA. This will provide the best network connectivity and Should be set to Unlimited. 
 4. Atlanta's secondary Express Route will be connected to the East US 2 region via Miami, FL. 
 
+# Azure Main Edge Network Connectivity
 A global vWAN is established with a hub in the primary and seconday regions. Centralized connectivity with Global scale VPN user acess is granted in the primary region. A secondary VPN landing zone is available to scale in the secondary region as needed. 
+
 Global load balancers are placed in front of the VPN gateways for failover scenarios. The scaling up of the secondary region will be managed via automation in the infrastructure operations spoke workload. 
+
 Site to Site VPN connectivity will not be used in this scenario, but it is a viable option when express routes are cost prohibitive. For smaller scale deployments, Fortinet's VPN solution works flawlessly to replace these express route components. 
 
-A firewall is deployed in each regions hub and is the central point of network flow between any workloads. A centralized firewall policy is used to manage all regions with a single policy set. 
+A firewall is deployed in each region's hub and is the central point of network flow between any workloads. A centralized firewall policy is used to manage all regions with a single policy set. 
 
 A set of core infrastructure spokes are established to provide critical services that make the environment useable, including security services, DNS, identity, infrastructure encryption, logging, monitoring, backups, certificate services, and other misc 
 automation that is used to optimize the various workflows of IT and cybersecurity. These services should be highly available and fully redundant by defualt. 
