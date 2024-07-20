@@ -31,13 +31,17 @@ resource "azurerm_virtual_wan" "vWAN-Enterprise-Services" {
     name                = "vWAN-Enterprise-Services"
     location            = "Central US"
     resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+    allow_branch_to_branch_traffic = true
+    office365_local_breakout_category = OptimizeAndAllow
+    type = Standard
 }
 
 # Create the Virtual WAN Hubs
 resource "azurerm_virtual_wan_hub" "vHub-CUS-01" {
     name                = "vHub-CUS-01"
-    virtual_wan_name    = azurerm_virtual_wan.vWAN-Enterprise-Services.name
     resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+    location = centralus
+    virtual_wan_id = azurerm_virtual_wan.vWAN-Enterprise-Services.id
 }
 
 resource "azurerm_virtual_wan_hub" "vHub-EUS-01" {
@@ -142,6 +146,10 @@ resource "azurerm_express_route_gateway" "ergw-vwan-eus-01" {
 3. Atlanta's primary Express Route will connected to the Central US region via Atlanta, GA. This will provide the best network connectivity and Should be set to Unlimited. 
 4. Atlanta's secondary Express Route will be connected to the East US 2 region via Miami, FL. This will provide the next best network connectivity and Should be set to Metered.
 */
+
+#region ExpressRoute-cmi-chi-cus-01
+
+#endregion
 
 #First, set the intermediry objects for the Express Route Circuits
 resource "azurerm_express_route_port" "example" {
