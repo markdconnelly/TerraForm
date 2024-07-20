@@ -7,7 +7,7 @@ and the fourth express route should connect via miami to east us 2.
 Include all available configurations
 
 This is better but still needs some tuning. The express route gateways are not connected to the express route circuits in our example, they will be connected to the
-gatways inside of the vWAN. 
+gatways inside of the vWAN. We can manually update that later. 
 */
 
 resource "azurerm_express_route_circuit" "express_route_1" {
