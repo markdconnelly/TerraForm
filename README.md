@@ -60,7 +60,7 @@ These include:
 
 From these Enterprise Spokes, we derive the core functionality of the systems. They provide the building blocks for us to build out a scalable architecture as well as a blueprint for a high availabilty design for various workload spokes. 
 
-After the enterprise spokes have been established, we can layer in a network management system. This is pretty critical to avoid IP conflicts. They are a nightmare to troubleshootin azure and an ounce of prevention is worth a pound of cure. 
+After the enterprise spokes have been established, we can layer in a network management system. This is pretty critical to avoid IP conflicts. They are a nightmare to troubleshoot in azure and an ounce of prevention is worth a pound of cure. 
 You should call some IP Address Management Sytstem (IPAM) and establish a workflow for determining the IP address spaces used in your spokes. Fortinet has an IPAM built into their suite and a full range of APIs that are accessible to accomplish this. 
 That integration is beyond the scope of this exercise though. We will be assigning IP addresses manually in a range that has been dedicated for this. 
 
@@ -85,4 +85,10 @@ From there, various workload components are built to provide a range of services
 My role as a DevSecOps architect (Focus on the Sec ;)), covers all of the main areas of this example. Because of that, most of the Security and IT based workloads are covered in the previous steps. For the spoke workloads, I will focus on a few cloud based Developer centric designs. 
 
 The ability to use tools like Azure Data Factory, pipelines, storage accounts, functions, and PaaS based sql databases, will be the main focus of these branch workloads. Any other service that supports integration with Azure private endpoints will also be viable though. All you need to do is integrate any new private DNS zones (pretty much unique per PaaS service) into your DNS systems, and drop that service's private endpoints into your existing vitural network design. 
+
+After your workload has been built and requires connectivity, network peering is the next step to connect it to the enterprise infrastructire.
+
+After it has been peered, a firewall policy collection is created for the work load. Various address groups are created to define the workloads scope, and all network and application rule sets are contained within this collection. 
+
+ Once peered, and the appropriate firewall rules given, your workload should be in a connected state. 
 
