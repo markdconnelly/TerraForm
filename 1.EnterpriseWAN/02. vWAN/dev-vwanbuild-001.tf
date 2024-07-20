@@ -165,7 +165,7 @@ resource "azurerm_firewall_policy" "azfw-policy-vwan" {
   threat_intelligence_mode = Deny
   dns {
     proxy_enabled = true
-    servers = [ "172.16.1.6","172.16.1.7","172.17.1.6","172.17.1.7" ] #Active Directory DNS
+    servers = [ "172.16.1.6","172.16.1.7","172.17.1.6","172.17.1.7" ] #Active Directory DNS - Use on prem until cloud DCs are established
   }
   identity {
     type = UserAssigned
