@@ -249,7 +249,9 @@ resource "azurerm_virtual_hub_routing_intent" "touteintent-eus" {
 }
 #endregion
 
-#region ExpressRoute
+#region ExpressRoutes
+
+
 # Create Express Route Gateways in each region
 # Note that scale units are set to correspond to the throughput and the failover design. In this case 5 scale units is the recommended value for 10Gbps throughput.
 # Each circuit in this instance can do 10G but not at the same time. The backup circuits at each location are metered in this example. 
