@@ -1,33 +1,75 @@
-resource "azurerm_express_route_circuit" "express_route_1" {
-    name                = "express_route_1"
+
+terraform {
+    required_providers {
+        azurerm = {
+            source  = "hashicorp/azurerm"
+            version = ">= 2.0"
+        }
+    }
+}
+
+provider "azurerm" {
+    features {}
+}
+
+resource "azurerm_resource_group" "Ent_ExpressRoutes_RG" {
+    name     = "Ent_ExpressRoutes_RG"
+    location = "Central US"
+}
+
+resource "azurerm_express_route_circuit" "er-champaign-chicago-cus-01" {
+    name                = "er-cmi-chi-cus-01"
     location            = "chicago"
-    resource_group_name = "your_resource_group_name"
-    sku                 = "Standard_MeteredData"
-    bandwidth_in_mbps   = 100
+    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+    bandwidth_in_mbps   = 10000
+    sku {
+        tier = "Standard"
+        family = "UnlimitedData"
+    }
 }
 
-resource "azurerm_express_route_circuit" "express_route_2" {
-    name                = "express_route_2"
+resource "azurerm_express_route_circuit" "er-champaign-dallas-eus-01" {
+    name                = "er-cmi-dal-eus-01"
     location            = "dallas"
-    resource_group_name = "your_resource_group_name"
-    sku                 = "Standard_MeteredData"
-    bandwidth_in_mbps   = 100
+    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+    bandwidth_in_mbps   = 10000
+    sku {
+        tier = "Standard"
+        family = "MeteredData"
+    }
 }
 
-resource "azurerm_express_route_circuit" "express_route_3" {
-    name                = "express_route_3"
+resource "azurerm_express_route_circuit" "er-atl-atl-01" {
+    name                = "er-atl-atl-01"
     location            = "atlanta"
-    resource_group_name = "your_resource_group_name"
-    sku                 = "Standard_MeteredData"
-    bandwidth_in_mbps   = 100
+    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+    bandwidth_in_mbps   = 10000
+    sku {
+        tier = "Standard"
+        family = "UnlimitedData"
+    }
 }
 
-resource "azurerm_express_route_circuit" "express_route_4" {
-    name                = "express_route_4"
+resource "azurerm_express_route_circuit" "er-atl-mia-01" {
+    name                = "er-atl-mia-01"
     location            = "miami"
-    resource_group_name = "your_resource_group_name"
-    sku                 = "Standard_MeteredData"
-    bandwidth_in_mbps   = 100
+    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+    bandwidth_in_mbps   = 10000
+    sku {
+        tier = "Standard"
+        family = "MeteredData"
+    }
+}
+
+resource "azurerm_express_route_circuit_peering" "example" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-champaign-chicago-cus-01.name
+  resource_group_name           = azurerm_resource_group.example.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  primary_peer_address_prefix   = "192.168.1.0/30"
+  secondary_peer_address_prefix = "192.168.2.0/30"
+  vlan_id                       = 87
 }
 
 resource "azurerm_express_route_circuit_connection" "connection_1" {

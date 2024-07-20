@@ -65,7 +65,7 @@ resource "azurerm_express_route_circuit_peering" "example" {
 }
 
 # Prompt 1 informs prompt 2
-/* Prompt 2: Can you write me the terraform block to deploy 4 express routes and connect them to an express route gateway in a virtual wan? 
+/* Prompt 2: Can you write me the terraform block to deploy 4 express routes and connect them to an express route gateways deployed in central and east us? 
 The first express route should connect via chicago to central us, 
 the second express route should connect via dallas to east us 2, 
 the third express route should connect via atlanta to central us, 
