@@ -262,77 +262,79 @@ resource "azurerm_express_route_gateway" "ergw-vwan-eus-01" {
 4. Atlanta's secondary Express Route will be connected to the East US 2 region via Miami, FL. This will provide the next best network connectivity and Should be set to Metered.
 */
 
-#region ExpressRoute-cmi-chi-cus-01
-
-#endregion
-
-#First, set the intermediry objects for the Express Route Circuits
-resource "azurerm_express_route_port" "example" {
-  name                = "er-port-cus-chi-01"
+#region 1. er-cmi-chi-cus-01
+resource "azurerm_express_route_port" "er-port-cmi-chi-cus-01" {
+  name                = "er-port-cmi-chi-cus-01"
   resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
   location            = azurerm_virtual_hub.vHub-CUS-01.location
   peering_location    = "MegaPort"
   bandwidth_in_gbps   = 10
+  billing_type = UnlimitedData
   encapsulation       = "Dot1Q"
 }
 
-resource "azurerm_express_route_port" "example" {
-  name                = "er-port-cus-dal-01"
-  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
-  location            = azurerm_virtual_hub.vHub-CUS-01.location
-  peering_location    = "AT&T"
-  bandwidth_in_gbps   = 10
-  encapsulation       = "Dot1Q"
-}
-
-resource "azurerm_express_route_port" "example" {
-  name                = "er-port-eus-atl-01"
-  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
-  location            = azurerm_virtual_hub.vHub-EUS-01.location
-  peering_location    = "MegaPort"
-  bandwidth_in_gbps   = 10
-  encapsulation       = "Dot1Q"
-}
-
-resource "azurerm_express_route_port" "example" {
-  name                = "er-port-eus-mia-01"
-  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
-  location            = azurerm_virtual_hub.vHub-EUS-01.location
-  peering_location    = "AT&T"
-  bandwidth_in_gbps   = 10
-  encapsulation       = "Dot1Q"
-}
-
-# Create the port authorization objects
-resource "azurerm_express_route_port_authorization" "example" {
-  name                    = "prtauth-cus-chi-01"
-  express_route_port_name = azurerm_express_route_port.er-port-cus-chi-01.name
+resource "azurerm_express_route_port_authorization" "prtauth-cmi-chi-cus-01" {
+  name                    = "prtauth-cmi-chi-cus-01"
+  express_route_port_name = azurerm_express_route_port.er-port-cmi-chi-cus-01.name
   resource_group_name     = azurerm_resource_group.Ent_vWAN_RG
 }
 
-resource "azurerm_express_route_port_authorization" "example" {
-  name                    = "prtauth-cus-chi-01"
-  express_route_port_name = azurerm_express_route_port.er-port-cus-chi-01.name
-  resource_group_name     = azurerm_resource_group.Ent_vWAN_RG
-}
-
-# Then create the circuits
 resource "azurerm_express_route_circuit" "er-cmi-chi-cus-01" {
     name                = "er-cmi-chi-cus-01"
-    location            = "chicago"
+    location            = azurerm_virtual_hub.vHub-CUS-01.location
     resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+    service_provider_name = "MegaPort"
+    peering_location = "Chicago"
     bandwidth_in_gbps   = 10
-    express_route_port_id = azurerm_express_route_port.er-port-cus-chi-01.id
+    express_route_port_id = azurerm_express_route_port.er-port-cmi-chi-cus-01.id
     sku {
         tier = "Standard"
         family = "UnlimitedData"
     }
 }
 
+resource "azurerm_express_route_circuit_peering" "er-cmi-chi-cus-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-cmi-chi-cus-01.name
+  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  ipv4_enabled = true
+  primary_peer_address_prefix   = "192.168.1.0/30"
+  secondary_peer_address_prefix = "192.168.2.0/30"
+  vlan_id                       = 87
+}
+
+resource "azurerm_express_route_connection" "con-er-cmi-chi-cus-01" {
+  name                             = "con-er-cmi-chi-cus-01"
+  express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-cus-01.id
+  express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-cmi-chi-cus-01-prvpeer.id
+}
+#endregion
+
+#region 2. er-cmi-dal-eus-01
+resource "azurerm_express_route_port" "er-port-cmi-dal-eus-01" {
+  name                = "er-port-cmi-dal-eus-01"
+  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+  location            = azurerm_virtual_hub.vHub-EUS-01.location
+  peering_location    = "AT&T"
+  bandwidth_in_gbps   = 10
+  billing_type = MeteredData
+  encapsulation       = "Dot1Q"
+}
+
+resource "azurerm_express_route_port_authorization" "prtauth-cmi-dal-eus-01" {
+  name                    = "prtauth-cmi-dal-eus-01"
+  express_route_port_name = azurerm_express_route_port.er-port-cmi-dal-eus-01.name
+  resource_group_name     = azurerm_resource_group.Ent_vWAN_RG.name
+}
+
 resource "azurerm_express_route_circuit" "er-cmi-dal-eus-01" {
     name                = "er-cmi-dal-eus-01"
-    location            = "dallas"
-    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+    location            = azurerm_virtual_hub.vHub-EUS-01.location
+    resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+    service_provider_name = "AT&T"
+    peering_location = "Dallas"
     bandwidth_in_gbps   = 10
     express_route_port_id = azurerm_express_route_port.er-port-cus-dal-01.id
     sku {
@@ -341,91 +343,16 @@ resource "azurerm_express_route_circuit" "er-cmi-dal-eus-01" {
     }
 }
 
-resource "azurerm_express_route_circuit" "er-atl-atl-01" {
-    name                = "er-atl-atl-01"
-    location            = "atlanta"
-    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
-    bandwidth_in_gbps   = 10
-    express_route_port_id = azurerm_express_route_port.er-port-eus-atl-01.id
-    sku {
-        tier = "Standard"
-        family = "UnlimitedData"
-    }
-}
-
-resource "azurerm_express_route_circuit" "er-atl-mia-01" {
-    name                = "er-atl-mia-01"
-    location            = "miami"
-    resource_group_name = azurerm_resource_group.Ent_ExpressRoutes_RG.name
-    bandwidth_in_gbps   = 10
-    express_route_port_id = azurerm_express_route_port.er-port-eus-mia-01.id
-    sku {
-        tier = "Standard"
-        family = "MeteredData"
-    }
-}
-
-# Create the Express Route Circuit Private Peerings
-resource "azurerm_express_route_circuit_peering" "er-cmi-chi-cus-01-prvpeer" {
-  peering_type                  = "AzurePrivatePeering"
-  express_route_circuit_name    = azurerm_express_route_circuit.er-cmi-chi-cus-01.name
-  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
-  shared_key                    = "ItsASecret"
-  peer_asn                      = 65656
-  primary_peer_address_prefix   = "192.168.1.0/30"
-  secondary_peer_address_prefix = "192.168.2.0/30"
-  vlan_id                       = 87
-}
-
 resource "azurerm_express_route_circuit_peering" "er-cmi-dal-eus-01-prvpeer" {
   peering_type                  = "AzurePrivatePeering"
-  express_route_circuit_name    = azurerm_express_route_circuit.er-champaign-chicago-cus-01.name
-  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
+  express_route_circuit_name    = azurerm_express_route_circuit.er-cmi-dal-eus-01.name
+  resource_group_name           = azurerm_resource_group.Ent_vWAN_RG.name
   shared_key                    = "ItsASecret"
   peer_asn                      = 65656
+  ipv4_enabled = true
   primary_peer_address_prefix   = "192.168.3.0/30"
   secondary_peer_address_prefix = "192.168.4.0/30"
   vlan_id                       = 92
-}
-
-resource "azurerm_express_route_circuit_peering" "er-cmi-dal-eus-01-prvpeer" {
-  peering_type                  = "AzurePrivatePeering"
-  express_route_circuit_name    = azurerm_express_route_circuit.er-champaign-chicago-cus-01.name
-  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
-  shared_key                    = "ItsASecret"
-  peer_asn                      = 65656
-  primary_peer_address_prefix   = "192.168.3.0/30"
-  secondary_peer_address_prefix = "192.168.4.0/30"
-  vlan_id                       = 92
-}
-
-resource "azurerm_express_route_circuit_peering" "er-atl-atl-01-prvpeer" {
-  peering_type                  = "AzurePrivatePeering"
-  express_route_circuit_name    = azurerm_express_route_circuit.er-atl-atl-01.name
-  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
-  shared_key                    = "ItsASecret"
-  peer_asn                      = 65656
-  primary_peer_address_prefix   = "192.168.5.0/30"
-  secondary_peer_address_prefix = "192.168.6.0/30"
-  vlan_id                       = 35
-}
-
-resource "azurerm_express_route_circuit_peering" "er-atl-mia-01-prvpeer" {
-  peering_type                  = "AzurePrivatePeering"
-  express_route_circuit_name    = azurerm_express_route_circuit.er-atl-mia-01.name
-  resource_group_name           = azurerm_resource_group.Ent_ExpressRoutes_RG.name
-  shared_key                    = "ItsASecret"
-  peer_asn                      = 65656
-  primary_peer_address_prefix   = "192.168.7.0/30"
-  secondary_peer_address_prefix = "192.168.8.0/30"
-  vlan_id                       = 17
-}
-
-# Create the connection objects to link the Express Route Circuits to the Virtual WAN
-resource "azurerm_express_route_connection" "con-er-cmi-chi-cus-01" {
-  name                             = "con-er-cmi-chi-cus-01"
-  express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-cus-01.id
-  express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-cmi-chi-cus-01-prvpeer.id
 }
 
 resource "azurerm_express_route_connection" "con-er-cmi-dal-eus-01" {
@@ -433,17 +360,105 @@ resource "azurerm_express_route_connection" "con-er-cmi-dal-eus-01" {
   express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-eus-01.id
   express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-cmi-dal-eus-01-prvpeer.id
 }
+#endregion
 
-resource "azurerm_express_route_connection" "con-er-atl-atl-01" {
-  name                             = "con-er-atl-atl-01"
-  express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-cus-01.id
-  express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-atl-atl-01-prvpeer.id
+#region 3. er-atl-atl-cus-01
+resource "azurerm_express_route_port" "er-port-atl-atl-cus-01" {
+  name                = "er-port-atl-atl-cus-01"
+  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+  location            = azurerm_virtual_hub.vHub-CUS-01.location
+  peering_location    = "MegaPort"
+  bandwidth_in_gbps   = 10
+  billing_type = UnlimitedData
+  encapsulation       = "Dot1Q"
 }
 
-resource "azurerm_express_route_connection" "con-er-atl-mia-01" {
-  name                             = "con-er-atl-mia-01"
-  express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-eus-01.id
-  express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-atl-mia-01-prvpeer.id
+resource "azurerm_express_route_port_authorization" "prtauth-atl-atl-cus-01" {
+  name                    = "prtauth-atl-atl-cus-01"
+  express_route_port_name = azurerm_express_route_port.er-port-atl-atl-cus-01.name
+  resource_group_name     = azurerm_resource_group.Ent_vWAN_RG.name
+}
+
+resource "azurerm_express_route_circuit" "er-atl-atl-cus-01" {
+    name                = "er-atl-atl-cus-01"
+    location            = azurerm_virtual_hub.vHub-CUS-01.location
+    resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+    service_provider_name = "MegaPort"
+    peering_location = "Atlanta"
+    bandwidth_in_gbps   = 10
+    express_route_port_id = azurerm_express_route_port.er-port-atl-atl-cus-01.id
+    sku {
+        tier = "Standard"
+        family = "UnlimitedData"
+    }
+}
+
+resource "azurerm_express_route_circuit_peering" "er-atl-atl-cus-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-atl-atl-cus-01.name
+  resource_group_name           = azurerm_resource_group.Ent_vWAN_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  ipv4_enabled = true
+  primary_peer_address_prefix   = "192.168.5.0/30"
+  secondary_peer_address_prefix = "192.168.6.0/30"
+  vlan_id                       = 35
+}
+
+resource "azurerm_express_route_connection" "con-er-atl-atl-cus-01" {
+  name                             = "con-er-atl-atl-cus-01"
+  express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-cus-01.id
+  express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-atl-atl-cus-01-prvpeer.id
 }
 #endregion
 
+#region 4. er-atl-mia-eus-01
+resource "azurerm_express_route_port" "er-port-atl-mia-eus-01" {
+  name                = "er-port-atl-mia-eus-01"
+  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+  location            = azurerm_virtual_hub.vHub-EUS-01.location
+  peering_location    = "AT&T"
+  bandwidth_in_gbps   = 10
+  billing_type = MeteredData
+  encapsulation       = "Dot1Q"
+}
+
+resource "azurerm_express_route_port_authorization" "prtauth-cmi-chi-cus-01" {
+  name                    = "prtauth-cmi-chi-cus-01"
+  express_route_port_name = azurerm_express_route_port.er-port-atl-mia-eus-01.name
+  resource_group_name     = azurerm_resource_group.Ent_vWAN_RG.name
+}
+
+resource "azurerm_express_route_circuit" "er-atl-mia-01" {
+    name                = "er-atl-mia-eus-01"
+    location            = azurerm_virtual_hub.vHub-EUS-01.location
+    resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+    service_provider_name = "AT&T"
+    peering_location = "Miami"
+    bandwidth_in_gbps   = 10
+    express_route_port_id = azurerm_express_route_port.er-port-atl-mia-eus-01.id
+    sku {
+        tier = "Standard"
+        family = "MeteredData"
+    }
+}
+
+resource "azurerm_express_route_circuit_peering" "er-atl-mia-01-prvpeer" {
+  peering_type                  = "AzurePrivatePeering"
+  express_route_circuit_name    = azurerm_express_route_circuit.er-atl-mia-01.name
+  resource_group_name           = azurerm_resource_group.Ent_vWAN_RG.name
+  shared_key                    = "ItsASecret"
+  peer_asn                      = 65656
+  ipv4_enabled = true
+  primary_peer_address_prefix   = "192.168.7.0/30"
+  secondary_peer_address_prefix = "192.168.8.0/30"
+  vlan_id                       = 17
+}
+
+resource "azurerm_express_route_connection" "con-er-atl-mia-eus-01" {
+  name                             = "con-er-atl-mia-eus-01"
+  express_route_gateway_id         = azurerm_express_route_gateway.ergw-vwan-eus-01.id
+  express_route_circuit_peering_id = azurerm_express_route_circuit_peering.er-atl-mia-01-prvpeer.id
+}#endregion
+#endregion
+#endregion
