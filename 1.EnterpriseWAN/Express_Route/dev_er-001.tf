@@ -69,6 +69,7 @@ resource "azurerm_express_route_circuit" "er-atl-mia-01" {
     }
 }
 
+# Create the Express Route Circuit Private Peerings
 resource "azurerm_express_route_circuit_peering" "er-cmi-chi-cus-01-prvpeer" {
   peering_type                  = "AzurePrivatePeering"
   express_route_circuit_name    = azurerm_express_route_circuit.er-cmi-chi-cus-01.name
