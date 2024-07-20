@@ -45,8 +45,7 @@ resource "azurerm_resource_group" "Ent_DevOps_LAW_RG" {
 }
 #endregion
 
-# Create the Log Analytics workspace for the Enterprise services
-
+# Create the Log Analytics workspaces for the Enterprise services
 resource "azurerm_log_analytics_workspace" "law-sentinel-cus-01" {
   name                = "law-sentinel-cus-01"
   location            = "Central US"
@@ -69,4 +68,18 @@ resource "azurerm_log_analytics_workspace" "law-devops-cus-01" {
   resource_group_name = azurerm_resource_group.Ent_DevOps_LAW_RG.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
+}
+
+resource "azurerm_monitor_diagnostic_setting" "sentinel-diag" {
+  name               = "sentinel-diag"
+  target_resource_id = azurerm_key_vault.example.id
+  log_analytics_workspace_id = law-sentinel-cus-01.id
+  log_analytics_destination_type = AzureDiagnostics
+
+  enabled_log {
+    category = "AllEvents"
+  }
+  metric {
+    category = "AllMetrics"
+    }
 }
