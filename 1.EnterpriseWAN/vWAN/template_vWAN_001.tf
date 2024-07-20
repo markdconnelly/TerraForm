@@ -1,3 +1,4 @@
+# Declate Azure as the resource provider via hashicorp/azurerm
 terraform {
     required_providers {
         azurerm = {
@@ -11,6 +12,23 @@ provider "azurerm" {
     features {}
 }
 
+resource "azurerm_resource_group" "example" {
+    name     = "my-resource-group"
+    location = "West US"
+}
+
+# Create the resource groups required for the Entreprise Virtual WAN
+resource "azurerm_resource_group" "example" {
+    name     = "my-resource-group"
+    location = "West US"
+}
+
+resource "azurerm_resource_group" "Ent_ExpressRoutes_RG" {
+    name     = "Ent_ExpressRoutes_RG"
+    location = "Central US"
+}
+
+
 resource "azurerm_virtual_wan" "example" {
     name                = "my-virtual-wan"
     location            = "West US"
@@ -21,10 +39,7 @@ resource "azurerm_virtual_wan" "example" {
     }
 }
 
-resource "azurerm_resource_group" "example" {
-    name     = "my-resource-group"
-    location = "West US"
-}
+
 
 resource "azurerm_virtual_wan_hub" "example" {
     name                = "my-virtual-wan-hub"
