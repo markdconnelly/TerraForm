@@ -31,8 +31,8 @@ resource "azurerm_user_assigned_identity" "mgid-ent-vwan" {
   resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
 }
 
-# Create an Azure Key Vault to sore the certificate for deep packet inspection
-resource "azurerm_key_vault" "example" {
+# Create an Azure Key Vault to store the certificate for deep packet inspection
+resource "azurerm_key_vault" "kv-ent-vwan" {
   name                        = "kv-ent-vwan"
   location                    = azurerm_resource_group.Ent_vWAN_RG.location
   resource_group_name         = azurerm_resource_group.Ent_vWAN_RG.name
@@ -47,6 +47,20 @@ resource "azurerm_key_vault" "example" {
     default_action = Deny
     bypass = AzureServices
   }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "kv-ent-vwan-sentinel-diag" {
+  name               = "kv-ent-vwan-sentinel-diag"
+  target_resource_id = azurerm_key_vault.kv-ent-vwan.id
+  log_analytics_workspace_id = law-sentinel-cus-01.id
+  log_analytics_destination_type = AzureDiagnostics
+
+  enabled_log {
+    category = "AllEvents"
+  }
+  metric {
+    category = "AllMetrics"
+    }
 }
 
 # import the current certificate frome the Key Vault
