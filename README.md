@@ -12,6 +12,7 @@ https://www.youtube.com/watch?v=QrSfASpVE14&list=PLnWpsLZNgHzVVslxs8Bwq19Ng0ff4X
 
 To illustrate this learning exercise, we must understand the intent behind the architecture getting built. This exercise will focus on an enterprise grade environment that is both close, secure, and highly available inter region and cross region. 
 
+# Environment Explanation
 In my case, this uses Central US and East US 2 for its region pairing. When thinking through your example, use your closest region pairing. If you were in Europe for example, my regions wouldn't make sense. 
 
 This environment has two primary on premise data centers in the United States. It's primary location is based in Champaign, IL and it's secondary location is in Atlanta, GA. There is 100Gbps private fiber connectivity between the primary and secondary on premise locations. 
@@ -82,7 +83,7 @@ A corresponding Network Security Group is created is made for each virtual netwo
 
 From there, various workload components are built to provide a range of services to the organization. Each of these workloads should be designed by an architect, tested by engineers, deployed to production via TerraForm and introduced into the support lifecycle for long term managment. 
 
-My role as a DevSecOps architect (Focus on the Sec ;)), covers all of the main areas of this example. Because of that, most of the Security and IT based workloads are covered in the previous steps. For the spoke workloads, I will focus on a few cloud based Developer centric designs. 
+My role as a DevSecOps architect (Focus on the Sec), covers all of the main areas of this example. Because of that, most of the Security and IT based workloads are covered in the previous steps. For the spoke workloads, I will focus on a few cloud based Developer centric designs. 
 
 The ability to use tools like Azure Data Factory, pipelines, storage accounts, functions, and PaaS based sql databases, will be the main focus of these branch workloads. Any other service that supports integration with Azure private endpoints will also be viable though. All you need to do is integrate any new private DNS zones (pretty much unique per PaaS service) into your DNS systems, and drop that service's private endpoints into your existing vitural network design. 
 
