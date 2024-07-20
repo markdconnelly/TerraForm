@@ -1,4 +1,4 @@
-
+# Declate Azure as the resource provider via hashicorp/azurerm
 terraform {
     required_providers {
         azurerm = {
@@ -12,10 +12,18 @@ provider "azurerm" {
     features {}
 }
 
+# Create the resource groups required for the Express Route Circuits
 resource "azurerm_resource_group" "Ent_ExpressRoutes_RG" {
     name     = "Ent_ExpressRoutes_RG"
     location = "Central US"
 }
+
+/* Create the Express Route Circuits:
+1. Champaign's primary Express Route will be connected to the Central US region via Chicago, IL. This will provide the best network connectivity and Should be set to Unlimited. 
+2. Champaign's secondary Express Route will be connected to the East US 2 region via Dallas, TX. This will provide the next best network connectivity and Should be set to Metered.
+3. Atlanta's primary Express Route will connected to the Central US region via Atlanta, GA. This will provide the best network connectivity and Should be set to Unlimited. 
+4. Atlanta's secondary Express Route will be connected to the East US 2 region via Miami, FL. This will provide the next best network connectivity and Should be set to Metered.
+*/
 
 resource "azurerm_express_route_circuit" "er-cmi-chi-cus-01" {
     name                = "er-cmi-chi-cus-01"
