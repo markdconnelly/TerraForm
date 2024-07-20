@@ -23,6 +23,91 @@ resource "azurerm_resource_group" "Ent_vWAN_RG" {
         description = "Resource group for the Enterprise Virtual WAN"
     }
 }
+
+# Create a user assigned managed identity to perform operations on behalf of the vWAN
+resource "azurerm_user_assigned_identity" "mgid-ent-vwan" {
+  name                = "mgid-ent-vwan"
+  location            = azurerm_resource_group.Ent_vWAN_RG.location
+  resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+}
+
+# Create an Azure Key Vault to sore the certificate for deep packet inspection
+resource "azurerm_key_vault" "example" {
+  name                        = "kv-ent-vwan"
+  location                    = azurerm_resource_group.Ent_vWAN_RG.location
+  resource_group_name         = azurerm_resource_group.Ent_vWAN_RG.name
+  enabled_for_disk_encryption = false
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = true
+  sku_name = "standard" 
+  enable_rbac_authorization = true
+  public_network_access_enabled = false
+  network_acls {
+    default_action = Deny
+    bypass = AzureServices
+  }
+}
+
+# import the current certificate frome the Key Vault
+# This is an error prone area. Figure out what cert config works consistently and update this block
+resource "azurerm_key_vault_certificate" "vWAN-DPI-Certificate" {
+  name         = "vWAN-DPI-Certificate"
+  key_vault_id = azurerm_key_vault.kv-ent-vwan.id
+  certificate {
+    contents = "Base64CertContents"
+    password = "SecretHere"
+  }
+  certificate_policy {
+    issuer_parameters {
+      name = "Self"
+    }
+
+    key_properties {
+      exportable = true
+      key_size   = 2048
+      key_type   = "RSA"
+      reuse_key  = true
+    }
+
+    lifetime_action {
+      action {
+        action_type = "AutoRenew"
+      }
+
+      trigger {
+        days_before_expiry = 30
+      }
+    }
+
+    secret_properties {
+      content_type = "application/x-pkcs12"
+    }
+
+    x509_certificate_properties {
+      # Server Authentication = 1.3.6.1.5.5.7.3.1
+      # Client Authentication = 1.3.6.1.5.5.7.3.2
+      extended_key_usage = ["1.3.6.1.5.5.7.3.1"]
+
+      key_usage = [
+        "cRLSign",
+        "dataEncipherment",
+        "digitalSignature",
+        "keyAgreement",
+        "keyCertSign",
+        "keyEncipherment",
+      ]
+
+      subject_alternative_names {
+        dns_names = ["internal.contoso.com", "domain.hello.world"]
+      }
+
+      subject            = "CN=hello-world"
+      validity_in_months = 12
+    }
+  }
+}
+
 #endregion
 
 #region VirtualWAN
@@ -42,19 +127,49 @@ resource "azurerm_virtual_wan_hub" "vHub-CUS-01" {
     resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
     location = centralus
     virtual_wan_id = azurerm_virtual_wan.vWAN-Enterprise-Services.id
+    address_prefix = "172.16.0.0/24"
+    hub_routing_preference = ASPath
 }
 
 resource "azurerm_virtual_wan_hub" "vHub-EUS-01" {
     name                = "vHub-EUS-01"
-    virtual_wan_name    = azurerm_virtual_wan.vWAN-Enterprise-Services.name
     resource_group_name = azurerm_resource_group.Ent_vWAN_RG.name
+    location = eastus2
+    virtual_wan_id = azurerm_virtual_wan.vWAN-Enterprise-Services.id
+    address_prefix = "172.17.0.0/24"
 }
 
 # Create the firewall policy for the Virtual WAN
+# Because manual management of firewall policies is common, it might be best to just import 
+# this object and let it be managed in the gui. 
 resource "azurerm_firewall_policy" "azfw-policy-vwan" {
   name                = "azfw-policy-vwan"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.Ent_vWAN_RG
+  location            = azurerm_resource_group.Ent_vWAN_RG
+  sku = Premium
+  auto_learn_private_ranges_enabled = true
+  threat_intelligence_mode = Deny
+  dns {
+    proxy_enabled = true
+    servers = [ "172.16.1.6","172.16.1.7","172.17.1.6","172.17.1.7" ] #Active Directory DNS
+  }
+  identity {
+    type = UserAssigned
+    identity_ids = azurerm_user_assigned_identity.mgid-ent-vwan.id
+  }
+  insights {
+    enabled = true
+    default_log_analytics_workspace_id = "Manually Link Logs Here"
+    retention_in_days = 7
+  }
+  intrusion_detection {
+    mode = Deny
+  }
+  tls_certificate {
+    name = azurerm_key_vault_certificate.vWAN-DPI-Certificate.name
+    key_vault_secret_id = azurerm_key_vault.kv-ent-vwan.id
+
+  }
 }
 
 # Create the Virtual WAN Hub Firewalls in each region
