@@ -59,3 +59,31 @@ resource "azurerm_network_security_group" "nsg-cus-hybriddns-01" {
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
 }
+
+#endregion
+
+#region DNS Resolver
+resource "azurerm_private_dns_resolver" "dns-cus-hybriddns-01" {
+  name                = "dns-cus-hybriddns-01"
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  virtual_network_id  = azurerm_virtual_network.vnet-cus-hybriddns-01.id
+}
+
+resource "azurerm_private_dns_resolver_inbound_endpoint" "dns-cus-hybriddns-01-inbound" {
+  name                    = "dns-cus-hybriddns-01-inbound"
+  private_dns_resolver_id = azurerm_private_dns_resolver.dns-cus-hybriddns-01.id
+  location                = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  ip_configurations {
+    private_ip_allocation_method = "Static"
+    private_ip_address          = "172.16.1.6"
+    subnet_id                    = azurerm_subnet.subnet-cus-hybriddns-inbound.id
+  }
+}
+
+resource "azurerm_private_dns_resolver_outbound_endpoint" "dns-cus-hybriddns-01-outbound" {
+  name                    = "dns-cus-hybriddns-01-outbound"
+  private_dns_resolver_id = azurerm_private_dns_resolver.dns-cus-hybriddns-01.id
+  location                = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  subnet_id               = azurerm_subnet.subnet-cus-hybriddns-outbound.id
+}
