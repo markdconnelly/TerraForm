@@ -17,7 +17,7 @@ resource "azurerm_resource_group" "Ent_SecOps_ActiveDirectory_RG" {
 #region Central US Network
 resource "azurerm_virtual_network" "vnet-cus-activedirectory" {
   name                = "vnet-cus-activedirectory"
-  address_space       = ["172.16.1.0/24"]
+  address_space       = ["172.16.0.0/24"]
   dns_servers = [ "172.16.0.6","172.16.0.7","172.17.0.6" ]
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
@@ -28,7 +28,7 @@ resource "azurerm_subnet" "subnet-cus-activedirectory" {
   name                 = "subnet-cus-activedirectory"
   resource_group_name  = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
   virtual_network_name = azurerm_virtual_network.vnet-cus-activedirectory.name
-  address_prefixes     = ["172.16.1.0/24"]
+  address_prefixes     = ["172.16.0.0/24"]
 }
 
 resource "azurerm_network_interface" "nic-cus-ad-01" {
@@ -69,7 +69,7 @@ resource "azurerm_network_security_group" "nsg-cus-activedirectory" {
 
 resource "azurerm_virtual_network" "vnet-eus-activedirectory" {
   name                = "vnet-eus-activedirectory"
-  address_space       = ["172.17.1.0/24"]
+  address_space       = ["172.17.0.0/24"]
   dns_servers = [ "172.17.0.6","172.17.0.7","172.16.0.6" ]
   location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
@@ -80,7 +80,7 @@ resource "azurerm_subnet" "subnet-eus-activedirectory" {
   name                 = "subnet-eus-activedirectory"
   resource_group_name  = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
   virtual_network_name = azurerm_virtual_network.vnet-eus-activedirectory.name
-  address_prefixes     = ["172.17.1.0/24"]
+  address_prefixes     = ["172.17.0.0/24"]
 }
 
 resource "azurerm_network_interface" "nic-eus-ad-01" {
