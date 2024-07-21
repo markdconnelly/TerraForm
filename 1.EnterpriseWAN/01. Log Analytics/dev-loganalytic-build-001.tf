@@ -69,17 +69,3 @@ resource "azurerm_log_analytics_workspace" "law-devops-cus-01" {
   sku                 = "PerGB2018"
   retention_in_days   = 30
 }
-
-resource "azurerm_monitor_diagnostic_setting" "sentinel-diag" {
-  name               = "sentinel-diag"
-  target_resource_id = azurerm_key_vault.example.id
-  log_analytics_workspace_id = law-sentinel-cus-01.id
-  log_analytics_destination_type = AzureDiagnostics
-
-  enabled_log {
-    category = "AllEvents"
-  }
-  metric {
-    category = "AllMetrics"
-    }
-}
