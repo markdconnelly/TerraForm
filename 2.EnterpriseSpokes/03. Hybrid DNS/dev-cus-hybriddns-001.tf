@@ -87,3 +87,22 @@ resource "azurerm_private_dns_resolver_outbound_endpoint" "dns-cus-hybriddns-01-
   location                = azurerm_virtual_wan_hub.vHub-CUS-01.location
   subnet_id               = azurerm_subnet.subnet-cus-hybriddns-outbound.id
 }
+
+resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "dnsfwd-cus-onprem-ruleset" {
+  name                                       = "dnsfwd-cus-onprem-ruleset"
+  resource_group_name                        = azurerm_resource_group.ent_cus_hybriddns_rg.name
+  location                                   = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  private_dns_resolver_outbound_endpoint_ids = [azurerm_private_dns_resolver_outbound_endpoint.dns-cus-hybriddns-01-outbound.id]
+}
+
+resource "azurerm_private_dns_resolver_forwarding_rule" "fwdrule-cus-onprem-com" {
+  name                      = "fwdrule-cus-onprem-com"
+  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.dnsfwd-cus-onprem-ruleset.id
+  domain_name               = "onprem.com."
+  enabled                   = true
+  target_dns_servers {
+    ip_address = ["172.16.0.6", "172.16.0.7", "172.17.0.6"]
+    port       = 53
+
+  }
+}
