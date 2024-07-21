@@ -33,7 +33,7 @@ resource "azurerm_subnet" "subnet-cus-activedirectory" {
 
 resource "azurerm_network_interface" "nic-cus-ad-01" {
   name                = "nic-cus-ad-01"
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-CUS-01.location
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 
   ip_configuration {
@@ -46,7 +46,7 @@ resource "azurerm_network_interface" "nic-cus-ad-01" {
 
 resource "azurerm_network_interface" "nic-cus-ad-02" {
   name                = "nic-cus-ad-02"
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-CUS-01.location
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 
   ip_configuration {
@@ -56,6 +56,13 @@ resource "azurerm_network_interface" "nic-cus-ad-02" {
     private_ip_address            = "172.16.0.7"
   }
 }
+
+resource "azurerm_network_security_group" "nsg-cus-activedirectory" {
+  name                = "nsg-cus-activedirectory"
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
 #endregion
 
 #region East US 2 Network
@@ -78,7 +85,7 @@ resource "azurerm_subnet" "subnet-eus-activedirectory" {
 
 resource "azurerm_network_interface" "nic-eus-ad-01" {
   name                = "nic-eus-ad-01"
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-EUS-01.location
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 
   ip_configuration {
@@ -91,7 +98,7 @@ resource "azurerm_network_interface" "nic-eus-ad-01" {
 
 resource "azurerm_network_interface" "nic-eus-ad-02" {
   name                = "nic-eus-ad-02"
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-EUS-01.location
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 
   ip_configuration {
@@ -107,7 +114,7 @@ resource "azurerm_network_interface" "nic-eus-ad-02" {
 resource "azurerm_windows_virtual_machine" "vm-cus-ad-01" {
   name                = "vm-cus-ad-01"
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-CUS-01.location
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   size                = "Standard_F2" #Update to more practical sku
   admin_username      = "MakeUniqueAdminName"
   admin_password      = "MakeUniqueSecret"
@@ -128,75 +135,5 @@ resource "azurerm_windows_virtual_machine" "vm-cus-ad-01" {
   }
 }
 
-resource "azurerm_windows_virtual_machine" "vm-cus-ad-02" {
-  name                = "vm-cus-ad-02"
-  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-CUS-01.location
-  size                = "Standard_F2" #Update to more practical sku
-  admin_username      = "MakeUniqueAdminName"
-  admin_password      = "MakeUniqueSecret"
-  network_interface_ids = [
-    azurerm_network_interface.nic-cus-ad-02.id,
-  ]
 
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_ZRS"
-  }
-
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
-    version   = "latest"
-  }
-}
-
-resource "azurerm_windows_virtual_machine" "vm-eus-ad-01" {
-  name                = "vm-eus-ad-01"
-  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-EUS-01.location
-  size                = "Standard_F2" #Update to more practical sku
-  admin_username      = "MakeUniqueAdminName"
-  admin_password      = "MakeUniqueSecret"
-  network_interface_ids = [
-    azurerm_network_interface.nic-eus-ad-01.id,
-  ]
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_ZRS"
-  }
-
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
-    version   = "latest"
-  }
-}
-
-resource "azurerm_windows_virtual_machine" "vm-eus-ad-02" {
-  name                = "vm-eus-ad-02"
-  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
-  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-EUS-01.location
-  size                = "Standard_F2" #Update to more practical sku
-  admin_username      = "MakeUniqueAdminName"
-  admin_password      = "MakeUniqueSecret"
-  network_interface_ids = [
-    azurerm_network_interface.nic-eus-ad-02.id,
-  ]
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_ZRS"
-  }
-
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
-    version   = "latest"
-  }
-}
 #endregion
