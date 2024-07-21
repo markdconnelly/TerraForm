@@ -157,3 +157,66 @@ resource "azurerm_monitor_diagnostic_setting" "kv-it-backup-services-sentinel-di
     }
 }
 #endregion
+
+#region Keys/DESs
+resource "azurerm_key_vault_key" "key-des-vm-cus-01" {
+  name         = "key-des-vm-cus-01"
+  key_vault_id = azurerm_key_vault.kv-it-infrastructure-encryption.id
+  key_type     = "RSA"
+  key_size     = 4096
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_key" "key-des-vm-eus-01" {
+  name         = "key-des-vm-eus-01"
+  key_vault_id = azurerm_key_vault.kv-it-infrastructure-encryption.id
+  key_type     = "RSA"
+  key_size     = 4096
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+}
+
+resource "azurerm_disk_encryption_set" "des-vm-cus-01" {
+  name                = "des-vm-cus-01"
+  resource_group_name = azurerm_resource_group.Ent_IT_KeyVault_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  key_vault_key_id    = azurerm_key_vault_key.key-des-vm-cus-01.id
+  auto_key_rotation_enabled = true
+  encryption_type = EncryptionAtRestWithPlatformAndCustomerKeys
+  identity {
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.mgid-ent-kv-infrastructure-encryption.id,
+    ]
+  }
+}
+
+resource "azurerm_disk_encryption_set" "des-vm-eus-01" {
+  name                = "des-vm-eus-01"
+  resource_group_name = azurerm_resource_group.Ent_IT_KeyVault_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
+  key_vault_key_id    = azurerm_key_vault_key.key-des-vm-eus-01.id
+  auto_key_rotation_enabled = true
+  encryption_type = EncryptionAtRestWithPlatformAndCustomerKeys
+  identity {
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.mgid-ent-kv-infrastructure-encryption.id,
+    ]
+  }
+}
