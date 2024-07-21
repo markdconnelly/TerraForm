@@ -6,6 +6,11 @@ provider "azurerm" {
 resource "azurerm_resource_group" "Ent_SecOps_ActiveDirectory_RG" {
   name     = "Ent_SecOps_ActiveDirectory_RG"
   location = "Central US"
+          tags = {
+        environment = "production"
+        costcenter = "Security Operations"
+        description = "Resource group for Enterprise Active Directory services"
+    }
 }
 #endregion
 
@@ -13,6 +18,7 @@ resource "azurerm_resource_group" "Ent_SecOps_ActiveDirectory_RG" {
 resource "azurerm_virtual_network" "vnet-cus-activedirectory" {
   name                = "vnet-cus-activedirectory"
   address_space       = ["172.16.1.0/24"]
+  dns_servers = [ "172.16.0.6","172.16.0.7","172.17.0.6" ]
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 }
@@ -57,6 +63,7 @@ resource "azurerm_network_interface" "nic-cus-ad-02" {
 resource "azurerm_virtual_network" "vnet-eus-activedirectory" {
   name                = "vnet-eus-activedirectory"
   address_space       = ["172.17.1.0/24"]
+  dns_servers = [ "172.17.0.6","172.17.0.7","172.16.0.6" ]
   location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
   resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 }
@@ -97,26 +104,98 @@ resource "azurerm_network_interface" "nic-eus-ad-02" {
 #endregion
 
 #region Active Directory
-resource "azurerm_windows_virtual_machine" "example" {
-  name                = "example-machine"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  size                = "Standard_F2"
-  admin_username      = "adminuser"
-  admin_password      = "P@$$w0rd1234!"
+resource "azurerm_windows_virtual_machine" "vm-cus-ad-01" {
+  name                = "vm-cus-ad-01"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-CUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
   network_interface_ids = [
-    azurerm_network_interface.example.id,
+    azurerm_network_interface.nic-cus-ad-01.id,
   ]
 
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "Standard_ZRS"
   }
 
   source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
-    sku       = "2016-Datacenter"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "vm-cus-ad-02" {
+  name                = "vm-cus-ad-02"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-CUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
+  network_interface_ids = [
+    azurerm_network_interface.nic-cus-ad-02.id,
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_ZRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "vm-eus-ad-01" {
+  name                = "vm-eus-ad-01"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-EUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
+  network_interface_ids = [
+    azurerm_network_interface.nic-eus-ad-01.id,
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_ZRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "vm-eus-ad-02" {
+  name                = "vm-eus-ad-02"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_resource_group.azurerm_virtual_wan_hub.vHub-EUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
+  network_interface_ids = [
+    azurerm_network_interface.nic-eus-ad-02.id,
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_ZRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
     version   = "latest"
   }
 }
