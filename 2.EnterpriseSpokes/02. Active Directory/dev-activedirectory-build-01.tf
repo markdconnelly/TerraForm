@@ -60,9 +60,9 @@ resource "azurerm_network_interface" "nic-cus-ad-02" {
 resource "azurerm_network_security_group" "nsg-cus-activedirectory" {
   name                = "nsg-cus-activedirectory"
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
 }
-
+# Add flow logs down the line after the IT ops tools are established
 #endregion
 
 #region East US 2 Network
@@ -108,6 +108,13 @@ resource "azurerm_network_interface" "nic-eus-ad-02" {
     private_ip_address            = "172.17.0.7"
   }
 }
+
+resource "azurerm_network_security_group" "nsg-eus-activedirectory" {
+  name                = "nsg-eus-activedirectory"
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+}
+# Add flow logs down the line after the IT ops tools are established
 #endregion
 
 #region Active Directory
@@ -118,13 +125,23 @@ resource "azurerm_windows_virtual_machine" "vm-cus-ad-01" {
   size                = "Standard_F2" #Update to more practical sku
   admin_username      = "MakeUniqueAdminName"
   admin_password      = "MakeUniqueSecret"
+  allow_extension_operations = true
+  provision_vm_agent = true 
+  patch_mode = "Manual"
+  patch_assessment_mode = "AutomaticByPlatform"
+  computer_name = "cus-ad-01"
+  enable_automatic_updates = false
+  reboot_setting = "Never"
+  encryption_at_host_enabled = true
+  secure_boot_enabled = true
+  vtpm_enabled = true
+  zone = "1"
   network_interface_ids = [
     azurerm_network_interface.nic-cus-ad-01.id,
   ]
-
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_ZRS"
+    storage_account_type = "StandardSSD_ZRS"
   }
 
   source_image_reference {
