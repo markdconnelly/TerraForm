@@ -140,10 +140,13 @@ resource "azurerm_windows_virtual_machine" "vm-cus-ad-01" {
     azurerm_network_interface.nic-cus-ad-01.id,
   ]
   os_disk {
+    name = "disk-cus-ad-01-os"
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_ZRS"
+    disk_size_gb = 100
+    disk_encryption_set_id = azurerm_disk_encryption_set.des-vm-cus-01.id
   }
-
+  #add 250GB Data Disk Here 
   source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
@@ -152,5 +155,114 @@ resource "azurerm_windows_virtual_machine" "vm-cus-ad-01" {
   }
 }
 
+resource "azurerm_windows_virtual_machine" "vm-cus-ad-02" {
+  name                = "vm-cus-ad-02"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
+  allow_extension_operations = true
+  provision_vm_agent = true 
+  patch_mode = "Manual"
+  patch_assessment_mode = "AutomaticByPlatform"
+  computer_name = "cus-ad-02"
+  enable_automatic_updates = false
+  reboot_setting = "Never"
+  encryption_at_host_enabled = true
+  secure_boot_enabled = true
+  vtpm_enabled = true
+  zone = "2"
+  network_interface_ids = [
+  azurerm_network_interface.nic-cus-ad-02.id,
+  ]
+  os_disk {
+    name = "disk-cus-ad-02-os"
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_ZRS"
+    disk_size_gb = 100
+    disk_encryption_set_id = azurerm_disk_encryption_set.des-vm-cus-01.id
+  }
+  #add 250GB Data Disk Here 
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+}
 
+resource "azurerm_windows_virtual_machine" "vm-eus-ad-01" {
+  name                = "vm-eus-ad-01"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
+  allow_extension_operations = true
+  provision_vm_agent = true 
+  patch_mode = "Manual"
+  patch_assessment_mode = "AutomaticByPlatform"
+  computer_name = "eus-ad-01"
+  enable_automatic_updates = false
+  reboot_setting = "Never"
+  encryption_at_host_enabled = true
+  secure_boot_enabled = true
+  vtpm_enabled = true
+  zone = "1"
+  network_interface_ids = [
+    azurerm_network_interface.nic-eus-ad-01.id,
+  ]
+  os_disk {
+    name = "disk-eus-ad-01-os"
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_ZRS"
+    disk_size_gb = 100
+    disk_encryption_set_id = azurerm_disk_encryption_set.des-vm-eus-01.id
+  }
+  #add 250GB Data Disk Here 
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "vm-eus-ad-02" {
+  name                = "vm-eus-ad-02"
+  resource_group_name = azurerm_resource_group.Ent_SecOps_ActiveDirectory_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
+  size                = "Standard_F2" #Update to more practical sku
+  admin_username      = "MakeUniqueAdminName"
+  admin_password      = "MakeUniqueSecret"
+  allow_extension_operations = true
+  provision_vm_agent = true 
+  patch_mode = "Manual"
+  patch_assessment_mode = "AutomaticByPlatform"
+  computer_name = "eus-ad-02"
+  enable_automatic_updates = false
+  reboot_setting = "Never"
+  encryption_at_host_enabled = true
+  secure_boot_enabled = true
+  vtpm_enabled = true
+  zone = "2"
+  network_interface_ids = [
+    azurerm_network_interface.nic-eus-ad-02.id,
+  ]
+  os_disk {
+    name = "disk-eus-ad-02-os"
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_ZRS"
+    disk_size_gb = 100
+    disk_encryption_set_id = azurerm_disk_encryption_set.des-vm-eus-01.id
+  }
+  #add 250GB Data Disk Here 
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+}
 #endregion
