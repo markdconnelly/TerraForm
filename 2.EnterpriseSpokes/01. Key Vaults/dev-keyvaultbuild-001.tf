@@ -34,6 +34,27 @@ resource "azurerm_resource_group" "Ent_IT_KeyVault_RG" {
         description = "Resource group for IT key vault services"
     }
 }
+
+# Create a user assigned managed identity to perform operations on behalf of the Certificate Operations Key Vault
+resource "azurerm_user_assigned_identity" "mgid-ent-kv-certops" {
+  name                = "mgid-ent-kv-certops"
+  location            = azurerm_resource_group.Ent_SecOps_KeyVault_RG.location
+  resource_group_name = azurerm_resource_group.Ent_SecOps_KeyVault_RG.name
+}
+
+# Create a user assigned managed identity to perform operations on behalf of the Infrastructure Encryption Key Vault
+resource "azurerm_user_assigned_identity" "mgid-ent-kv-infrastructure-encryption" {
+  name                = "mgid-ent-kv-infrastructure-encryption"
+  location            = azurerm_resource_group.Ent_IT_KeyVault_RG.location
+  resource_group_name = azurerm_resource_group.Ent_IT_KeyVault_RG.name
+}
+
+# Create a user assigned managed identity to perform operations on behalf of the Backup Key Vault
+resource "azurerm_user_assigned_identity" "mgid-ent-kv-backup" {
+  name                = "mgid-ent-kv-backup"
+  location            = azurerm_resource_group.Ent_IT_KeyVault_RG.location
+  resource_group_name = azurerm_resource_group.Ent_IT_KeyVault_RG.name
+}
 #endregion
 
 #region KeyVault Build
