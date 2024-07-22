@@ -106,6 +106,7 @@ resource "azurerm_private_dns_resolver_forwarding_rule" "fwdrule-cus-onprem-com"
 
   }
 }
+#endregion
 
 #region Private DNS Zones
 resource "azurerm_private_dns_zone" "zone-privatelink-global.wvd.microsoft.com" {
@@ -262,7 +263,6 @@ resource "azurerm_private_dns_zone" "zone-privatelink.datafactory.azure.us" {
   name                = "privatelink.datafactory.azure.us."
   resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
 }
-
-
+#endregion
 
 
