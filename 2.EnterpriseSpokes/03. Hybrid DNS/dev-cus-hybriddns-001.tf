@@ -106,3 +106,163 @@ resource "azurerm_private_dns_resolver_forwarding_rule" "fwdrule-cus-onprem-com"
 
   }
 }
+
+#region Private DNS Zones
+resource "azurerm_private_dns_zone" "zone-privatelink-global.wvd.microsoft.com" {
+  name                = "privatelink-global.wvd.microsoft.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.database.windows.net" {
+  name                = "privatelink.database.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.mysql.database.azure.com" {
+  name                = "privatelink.mysql.database.azure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.redis.cache.windows.net" {
+  name                = "privatelink.redis.cache.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.redisenterprise.cache.azure.net" {
+  name                = "privatelink.redisenterprise.cache.azure.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.his.arc.azure.com" {
+  name                = "privatelink.his.arc.azure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.guestconfiguration.azure.com" {
+  name                = "privatelink.guestconfiguration.azure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.servicebus.windows.net" {
+  name                = "privatelink.servicebus.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.eventgrid.azure.net" {
+  name                = "privatelink.eventgrid.azure.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.azure-api.net" {
+  name                = "privatelink.azure-api.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.azure-automation.net" {
+  name                = "privatelink.azure-automation.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.cus.backup.windowsazure.com" {
+  name                = "privatelink.cus.backup.windowsazure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.eus2.backup.windowsazure.com" {
+  name                = "privatelink.eus2.backup.windowsazure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.siterecovery.windowsazure.com" {
+  name                = "privatelink.siterecovery.windowsazure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.monitor.azure.com" {
+  name                = "privatelink.monitor.azure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.oms.opinsights.azure.com" {
+  name                = "privatelink.oms.opinsights.azure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.ods.opinsights.azure.com" {
+  name                = "privatelink.ods.opinsights.azure.com."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.agentsvc.azure-automation.net" {
+  name                = "privatelink.agentsvc.azure-automation.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.vaultcore.azure.net" {
+  name                = "privatelink.vaultcore.azure.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.blob.core.windows.net" {
+  name                = "privatelink.blob.core.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.table.core.windows.net" {
+  name                = "privatelink.table.core.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.queue.core.windows.net" {
+  name                = "privatelink.queue.core.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.file.core.windows.net" {
+  name                = "privatelink.file.core.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.web.core.windows.net" {
+  name                = "privatelink.web.core.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.dfs.core.windows.net" {
+  name                = "privatelink.dfs.core.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.afs.azure.net" {
+  name                = "privatelink.afs.azure.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.search.windows.net" {
+  name                = "privatelink.search.windows.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.azurewebsites.net" {
+  name                = "privatelink.azurewebsites.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-scm.privatelink.azurewebsites.net" {
+  name                = "scm.privatelink.azurewebsites.net."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.adf.azure.us" {
+  name                = "privatelink.adf.azure.us."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+resource "azurerm_private_dns_zone" "zone-privatelink.datafactory.azure.us" {
+  name                = "privatelink.datafactory.azure.us."
+  resource_group_name = azurerm_resource_group.ent_cus_hybriddns_rg.name
+}
+
+
+
+
