@@ -19,3 +19,8 @@ resource "azurerm_data_factory" "adf-devops-dp-01" {
   resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
 }
 
+# Managed Identity for workload
+# Key Vault for the workload
+# Etc Building Blocks
+
+#endregion
