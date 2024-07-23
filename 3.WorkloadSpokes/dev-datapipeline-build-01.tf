@@ -44,7 +44,9 @@ resource "azurerm_key_vault_key" "key-adf-devops-dp-01-rotate1yr" {
   key_vault_id = azurerm_key_vault.kv-it-infrastructure-encryption.id
   key_type     = "RSA"
   key_size     = 4096
-
+  # fix activation and expiration dates here
+  not_before_date = "2021-01-01T00:00:00+00:00"
+  expiration_date = "2022-01-01T00:00:00+00:00"
   key_opts = [
     "decrypt",
     "encrypt",
@@ -57,12 +59,19 @@ resource "azurerm_key_vault_key" "key-adf-devops-dp-01-rotate1yr" {
   # fix rotation policy logic here
   rotation_policy {
     automatic {
-      time_before_expiry = "P30D"
+      time_before_expiry = "P3M"
     }
 
-    expire_after         = "P90D"
-    notify_before_expiry = "P29D"
+    expire_after         = "P1Y"
+    notify_before_expiry = "P30D"
   }
+}
+
+# probably too granular of a scope, but illustrates
+resource "azurerm_role_assignment" "roleassign-key-adf-devops-dp-01-rotate1yr" {
+  scope                = azurerm_key_vault_key.key-adf-devops-dp-01-rotate1yr.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = azurerm_user_assigned_identity.mgid-ent-kv-infrastructure-encryption.principal_id
 }
 #endregion
 
@@ -127,6 +136,13 @@ resource "azurerm_data_factory" "adf-devops-dp-01" {
   identity {
     type = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.mgid-devops-datapipeline-01.id]
+  }
+  github_configuration {
+    account_name = "github"
+    branch_name = "main"
+    git_url = "https://github.com"
+    repository_name = "myrepo"
+    root_folder = "/"
   }
 }
 #endregion
