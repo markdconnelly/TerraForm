@@ -202,9 +202,6 @@ resource "azurerm_storage_account" "stgdevopsdp01" {
     ip_rules                   = ["10.0.0.0/8"]
     bypass = "AzureServices"
     virtual_network_subnet_ids = [subnet-cus-datapipeline-01-default.id, subnet-eus-datapipeline-01-default.id]
-    private_link_access {
-      
-    }
   }
   identity {
     type = "UserAssigned"
