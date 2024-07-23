@@ -68,21 +68,34 @@ resource "azurerm_network_security_group" "nsg-eus-datapipeline-01" {
 
 #endregion
 
+#region Data Factory
 # Data Factory for the workload
 resource "azurerm_data_factory" "adf-devops-dp-01" {
   name                = "adf-devops-dp-01"
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
 }
+#endregion
 
-# Storage Account
-# 10 Containers for various data operations
+#region Storage Account
 
-# App Service Plan HA between regions
+#endregion
 
-# Function Apps
+#region Containers
 
-# Logic App
+#endregion
+
+#region App Service Plan
+
+#endregion
+
+#region Function Apps
+
+#endregion
+
+#region Logic App
+
+#endregion
 
 
 
