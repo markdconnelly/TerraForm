@@ -103,6 +103,25 @@ resource "azurerm_role_assignment" "roleassign-key-adf-devops-dp-01-rotate1yr" {
 }
 #endregion
 
+#region Global Load Balancing
+resource "azurerm_cdn_frontdoor_profile" "example" {
+  name                = "example-profile"
+  resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "Standard_AzureFrontDoor"
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "example" {
+  name                     = "example-customDomain"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
+  dns_zone_id              = azurerm_dns_zone.example.id
+  host_name                = "contoso.fabrikam.com"
+
+  tls {
+    certificate_type    = "ManagedCertificate"
+    minimum_tls_version = "TLS12"
+  }
+}
+
 #region CUS Network Block
 resource "azurerm_virtual_network" "vnet-cus-datapipeline-01" {
   name                = "vnet-cus-datapipeline-01"
