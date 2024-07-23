@@ -38,6 +38,32 @@ resource "azurerm_key_vault" "kv-devops-datapipeline-01" {
     bypass = AzureServices
   }
 }
+
+resource "azurerm_key_vault_key" "key-adf-devops-dp-01-rotate1yr" {
+  name         = "key-adf-devops-dp-01-rotate1yr"
+  key_vault_id = azurerm_key_vault.kv-it-infrastructure-encryption.id
+  key_type     = "RSA"
+  key_size     = 4096
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+
+  # fix rotation policy logic here
+  rotation_policy {
+    automatic {
+      time_before_expiry = "P30D"
+    }
+
+    expire_after         = "P90D"
+    notify_before_expiry = "P29D"
+  }
+}
 #endregion
 
 #region CUS Network Block
@@ -95,23 +121,24 @@ resource "azurerm_data_factory" "adf-devops-dp-01" {
   name                = "adf-devops-dp-01"
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
+  public_network_enabled = false
+  customer_managed_key_id = key-adf-devops-dp-01-rotate1yr.id
+  customer_managed_key_identity_id = azurerm_user_assigned_identity.mgid-ent-kv-infrastructure-encryption.id
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mgid-devops-datapipeline-01.id]
+  }
 }
 #endregion
 
 #region Storage Account
-resource "azurerm_storage_account" "example" {
-  name                     = "storageaccountname"
+resource "azurerm_storage_account" "stgdevopsdp01" {
+  name                     = "stgdevopsdp01"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
-
-  tags = {
-    environment = "staging"
-  }
 }
-
-
 #endregion
 
 #region Containers
