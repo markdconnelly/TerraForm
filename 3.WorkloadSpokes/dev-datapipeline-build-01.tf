@@ -75,4 +75,17 @@ resource "azurerm_data_factory" "adf-devops-dp-01" {
   resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
 }
 
+# Storage Account
+# 10 Containers for various data operations
+
+# App Service Plan HA between regions
+
+# Function Apps
+
+# Logic App
+
+
+
+
+
 
