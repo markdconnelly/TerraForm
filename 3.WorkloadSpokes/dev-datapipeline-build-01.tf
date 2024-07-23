@@ -287,11 +287,6 @@ resource "azurerm_windows_function_app" "fnc-data-process-01" {
     issuer = "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/"
     runtime_version = "~3"
   }
-  backup {
-    enabled = true
-    frequency_in_minutes = 1440
-    retention_period_in_days = 30
-  }
   site_config {
     app_service_logs {
 
@@ -301,7 +296,7 @@ resource "azurerm_windows_function_app" "fnc-data-process-01" {
       use_dotnet_isolated_runtime = true
     }
     app_scale_limit = 5
-    application_insights_connection_string = Put A Connection String Here
+    application_insights_connection_string = ""
     application_insights_key = ""
   }
   identity {
@@ -309,8 +304,6 @@ resource "azurerm_windows_function_app" "fnc-data-process-01" {
     identity_ids = [azurerm_user_assigned_identity.mgid-devops-datapipeline-01.id]
   
   }
-  
-  application_stack
 }
 
 #endregion
