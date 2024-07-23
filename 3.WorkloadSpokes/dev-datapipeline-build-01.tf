@@ -305,11 +305,6 @@ resource "azurerm_windows_function_app" "fnc-data-process-01" {
   
   }
 }
-
-#endregion
-
-#region Logic App
-
 #endregion
 
 
