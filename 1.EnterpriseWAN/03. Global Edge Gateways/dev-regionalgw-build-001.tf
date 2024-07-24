@@ -9,14 +9,14 @@ terraform {
     }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "West Europe"
+resource "azurerm_resource_group" "Ent_vWAN_Edge_Gateways_RG" {
+  name     = "Ent_vWAN_Edge_Gateways_RG"
+  location = "Central US"
 }
 
-resource "azurerm_cdn_frontdoor_profile" "example" {
-  name                = "example-cdn-profile"
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_cdn_frontdoor_profile" "afd-cdn-prodile-01" {
+  name                = "afd-cdn-prodile-01"
+  resource_group_name = azurerm_resource_group.Ent_vWAN_Edge_Gateways_RG.name
   sku_name            = "Standard_AzureFrontDoor"
 
   tags = {
