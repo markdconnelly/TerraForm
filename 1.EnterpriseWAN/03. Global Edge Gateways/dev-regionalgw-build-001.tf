@@ -12,16 +12,21 @@ terraform {
 resource "azurerm_resource_group" "Ent_vWAN_Edge_Gateways_RG" {
   name     = "Ent_vWAN_Edge_Gateways_RG"
   location = "Central US"
+            tags = {
+        environment = "production"
+        costcenter = "IT"
+        description = "Resource group for Azure front door, API management, and regional application gateway services. Critical business operations are dependent on these pipelines."
+    }
 }
+#endregion
+
+#region Azure Front Door
 
 resource "azurerm_cdn_frontdoor_profile" "afd-cdn-prodile-01" {
   name                = "afd-cdn-prodile-01"
   resource_group_name = azurerm_resource_group.Ent_vWAN_Edge_Gateways_RG.name
-  sku_name            = "Standard_AzureFrontDoor"
-
-  tags = {
-    environment = "Production"
-  }
+  sku_name            = "Premium_AzureFrontDoor"
+  response_timeout_seconds = 30
 }
 
 
