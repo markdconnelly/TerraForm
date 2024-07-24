@@ -275,21 +275,31 @@ resource "azurerm_storage_queue" "stage3-queue" {
 }
 #endregion
 
-#region App Service Plan
+#region App Service Plans
 resource "azurerm_service_plan" "srvpln-cus-devops-dp-01" {
-  name                = "srvpln-devops-dp-01"
+  name                = "srvpln-cus-devops-dp-01"
   resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   os_type             = "Windows"
-  sku_name            = "P0v3"
+  sku_name            = "PEv3"
+  worker_count = 2
+  zone_balancing_enabled = true
+}
+
+resource "azurerm_service_plan" "srvpln-eus-devops-dp-01" {
+  name                = "srvpln-eus-devops-dp-01"
+  resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
+  os_type             = "Windows"
+  sku_name            = "PEv3"
   worker_count = 2
   zone_balancing_enabled = true
 }
 #endregion
 
 #region Function Apps
-resource "azurerm_windows_function_app" "fnc-data-process-01" {
-  name                = "fnc-data-process-01"
+resource "azurerm_windows_function_app" "fnc-cus-data-process-01" {
+  name                = "fnc-cus-data-process-01"
   resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
   location            = azurerm_virtual_wan_hub.vHub-CUS-01.location
   service_plan_id = azurerm_service_plan.srvpln-cus-devops-dp-01.id
@@ -325,6 +335,43 @@ resource "azurerm_windows_function_app" "fnc-data-process-01" {
   }
 }
 #endregion
+
+resource "azurerm_windows_function_app" "fnc-eus-data-process-01" {
+  name                = "fnc-eus-data-process-01"
+  resource_group_name = azurerm_resource_group.Ent_DevOps_DataPipeline-01_RG.name
+  location            = azurerm_virtual_wan_hub.vHub-EUS-01.location
+  service_plan_id = azurerm_service_plan.srvpln-cus-devops-dp-01.id
+  client_certificate_enabled = true
+  client_certificate_mode = "Required"
+  enabled = true
+  https_only = true
+  public_network_access_enabled = false
+  key_vault_reference_identity_id = [azurerm_user_assigned_identity.mgid-devops-datapipeline-01.id]
+  virtual_network_subnet_id = subnet-cus-datapipeline-01-default.id
+  auth_settings {
+    enabled = true
+    default_provider = "AzureActiveDirectory"
+    issuer = "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/"
+    runtime_version = "~3"
+  }
+  site_config {
+    app_service_logs {
+
+    }
+    application_stack {
+      dotnet_version = v8.0
+      use_dotnet_isolated_runtime = true
+    }
+    app_scale_limit = 5
+    application_insights_connection_string = ""
+    application_insights_key = ""
+  }
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mgid-devops-datapipeline-01.id]
+  
+  }
+}
 
 
 
