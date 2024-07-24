@@ -1,3 +1,30 @@
+#region BuildingBlocks
+# Declate Azure as the resource provider via hashicorp/azurerm
+terraform {
+    required_providers {
+        azurerm = {
+            source  = "hashicorp/azurerm"
+            version = ">= 2.0"
+        }
+    }
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
+
+resource "azurerm_cdn_frontdoor_profile" "example" {
+  name                = "example-cdn-profile"
+  resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "Standard_AzureFrontDoor"
+
+  tags = {
+    environment = "Production"
+  }
+}
+
+
 data "azurerm_api_management" "example" {
   name                = "example-api"
   resource_group_name = "example-resources"
